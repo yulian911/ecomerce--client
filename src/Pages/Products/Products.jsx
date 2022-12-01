@@ -2,6 +2,8 @@ import React from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import List from "../../components/List/List";
+import { useGetSubCategoriesQuery } from "../../features/subCategories/subCategoriesApiSlice";
+
 
 // import useFetch from "../../hooks/useFetch";
 import "./Products.scss";
@@ -9,40 +11,52 @@ import "./Products.scss";
 const Products = () => {
   const catId = parseInt(useParams().id);
   const [maxPrice, setMaxPrice] = useState(1000);
-  const [sort, setSort] = useState(null);
+  const [sort, setSort] = useState("asc");
   const [selectedSubCats, setSelectedSubCats] = useState([]);
 
-  // const { data, loading, error } = useFetch(
-  //   `/sub-categories?[filters][categories][id][$eq]=${catId}`
-  // );
+  const {
+    data,
+    isLoading,
+    isSuccess,
+    isError,
+    error
+  }=useGetSubCategoriesQuery({catId},{
+    pollingInterval: 15000,
+    refetchOnFocus: true,
+    refetchOnMountOrArgChange: true
+  })
 
-  // const handleChange = (e) => {
-  //   const value = e.target.value;
-  //   const isChecked = e.target.checked;
+  const handleChange = (e) => {
+    const value = e.target.value;
+    const isChecked = e.target.checked;
 
-  //   setSelectedSubCats(
-  //     isChecked
-  //       ? [...selectedSubCats, value]
-  //       : selectedSubCats.filter((item) => item !== value)
-  //   );
-  // };
+    setSelectedSubCats(
+      isChecked
+        ? [...selectedSubCats, value]
+        : selectedSubCats.filter((item) => item !== value)
+    );
+  };
 
+
+  console.log(sort)
+
+  console.log(data)
   return (
     <div className="products">
       <div className="left">
         <div className="filterItem">
           <h2>Product Categories</h2>
-          {/* {data?.map((item) => ( */}
-            <div className="inputItem" >
+          {data?.data.map((item) => (
+            <div className="inputItem" key={item.id} >
               <input
                 type="checkbox"
-                // id={item.id}
-                // value={item.id}
-                // onChange={handleChange}
+                id={item.id}
+                value={item.id}
+                onChange={handleChange}
               />
-              <label >Shoes</label>
+              <label htmlFor={item.id}>{item?.attributes.title}</label>
             </div>
-          {/* ))} */}
+         ))}
         </div>
         <div className="filterItem">
           <h2>Filter by price</h2>
@@ -87,7 +101,7 @@ const Products = () => {
           src="https://images.pexels.com/photos/1074535/pexels-photo-1074535.jpeg?auto=compress&cs=tinysrgb&w=1600"
           alt=""
         />
-        <List />
+        <List catId={catId} maxPrice={maxPrice} sort={sort} subCats={selectedSubCats}/>
       </div>
     </div>
   );

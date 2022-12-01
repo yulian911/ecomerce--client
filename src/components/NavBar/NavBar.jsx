@@ -24,9 +24,9 @@ const NavBar = () => {
             <KeyboardArrowDownIcon />
           </div>
           {["Women","Men","Children"].map((el,i)=>(
-             <div className="item">
-             <Link className ="link" to={`/products/${i+1}`}>{el}</Link>
-           </div>
+             <div className="item" key={i}>
+              <Link className ="link" to={`/products/${i+1}`}>{el}</Link>
+            </div>
           ))}
       
         </div>
@@ -38,7 +38,7 @@ const NavBar = () => {
             <Link className ="link" to="/">Homepage</Link>
           </div>
           {["About","Contact","Stores"].map((el,i)=>(
-            <div className="item">
+            <div className="item" key={i}>
               <Link className ="link" to="/">{el}</Link>
             </div>
           ))}
