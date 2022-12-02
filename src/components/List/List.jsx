@@ -2,6 +2,7 @@ import React from "react";
 import "./List.scss";
 import Card from "../Card/Card";
 import { useGetAllProductsCategoriesQuery } from "../../features/Products/productsApiSlice";
+import useFetch from "../../hook/useFetch";
 
 
 const List = ({ subCats, maxPrice, sort, catId })=> {
@@ -16,14 +17,20 @@ const List = ({ subCats, maxPrice, sort, catId })=> {
     refetchOnFocus: true,
     refetchOnMountOrArgChange: true
   })
+
+
   if(isLoading){
     return <p>Loading...</p>
   }
-
+  // const { data, loading, error } = useFetch(
+  //   `/products?populate=*&[filters][categories][id]=${catId}${subCats.map(
+  //     (item) => `&[filters][sub_categories][id][$eq]=${item}`
+  //   )}&[filters][price][$lte]=${maxPrice}&sort=price:${sort}`
+  // );
 
   return (
     <div className="list">
-        {data?.data.map((el,i)=>(
+        {data?.data?.map((el,i)=>(
           <Card key={el.id} item={el}/>
        ))}
     </div>

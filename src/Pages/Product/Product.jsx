@@ -3,34 +3,47 @@ import "./Product.scss"
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import BalanceIcon from "@mui/icons-material/Balance";
+import { useGetOneProductQuery } from '../../features/Products/productsApiSlice';
+import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart } from '../../features/Cart/cartSlice';
 
 
-const images =[
-    "https://images.pexels.com/photos/1549200/pexels-photo-1549200.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/949670/pexels-photo-949670.jpeg?auto=compress&cs=tinysrgb&w=1600",
 
-]
 
 
 const Product = () => {
-  const [selectImg, setSelectImg] = useState(0)
+  const [selectImg, setSelectImg] = useState("img")
   const [quantity, setQuantity] = useState(1)
+  const {id} =useParams()
+  const {data}=useGetOneProductQuery({id},{
+    pollingInterval: 15000,
+    refetchOnFocus: true,
+    refetchOnMountOrArgChange: true
+  })
+
+  const products =useSelector(state =>state.cart)
+    const dispatch = useDispatch()
+
+ 
+
+
   return (
     <div className='product'>
       <div className='left'>
         <div className='images'>
-          <img src={images[0]} alt="" onClick={()=>setSelectImg(0)}/>
-          <img src={images[1]} alt="" onClick={()=>setSelectImg(1)}/>
+          <img src={import.meta.env.VITE_APP_API_UPLOAD_URL+data?.data?.attributes?.img?.data?.attributes?.url} alt="" onClick={()=>setSelectImg("img")}/>
+          <img src={import.meta.env.VITE_APP_API_UPLOAD_URL+data?.data?.attributes?.img2?.data?.attributes?.url} alt="" onClick={()=>setSelectImg("img2")}/>
         </div>
         <div className="mainImg">
-          <img src={images[selectImg]} alt="" />
+          <img src={import.meta.env.VITE_APP_API_UPLOAD_URL+data?.data?.attributes[selectImg]?.data?.attributes?.url} alt="" />
         </div>
       </div>
       <div className="right">
-          <h1>title</h1>
-          <span>199$</span>
+          <h1>{data?.data?.attributes?.title}</h1>
+          <span>{data?.data?.attributes?.price}$</span>
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa, hic est corrupti nulla sunt velit? Debitis omnis repudiandae cumque officiis perferendis, sequi tenetur amet, eveniet ab mollitia, soluta sed dolorem.
+           {data?.data?.attributes?.desc}
           </p>
           <div className="quantity">
             <button onClick={()=>setQuantity(prev=>prev===1 ?1 : prev-1)}>-</button>
@@ -39,18 +52,18 @@ const Product = () => {
           </div>
           <button
               className="add"
-              // onClick={() =>
-              //   dispatch(
-              //     addToCart({
-              //       id: data.id,
-              //       title: data.attributes.title,
-              //       desc: data.attributes.desc,
-              //       price: data.attributes.price,
-              //       img: data.attributes.img.data.attributes.url,
-              //       quantity,
-              //     })
-              //   )
-              // }
+              onClick={() =>
+                dispatch(
+                  addToCart({
+                    id: data.data.id,
+                    title: data.data.attributes.title,
+                    desc: data.data.attributes.desc,
+                    price: data.data.attributes.price,
+                    img: data.data.attributes.img.data.attributes.url,
+                    quantity,
+                  })
+                )
+              }
             >
               <AddShoppingCartIcon /> ADD TO CART
             </button>
